@@ -1,17 +1,6 @@
 #include "main.h"
 
 /**
- * struct spec_s - specifier map
- * @sp: specifier character
- * @fn: handler function
- */
-typedef struct spec_s
-{
-	char sp;
-	int (*fn)(va_list);
-} spec_t;
-
-/**
  * dispatch - routes to the correct handler
  * @c: specifier character
  * @ap: variadic argument list
