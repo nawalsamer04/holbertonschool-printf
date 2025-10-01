@@ -1,77 +1,39 @@
 #include "main.h"
 
 /**
- * dispatch - routes to the correct handler
- * @c: specifier character
- * @ap: variadic argument list
- * Return: chars printed by handler, -1 on error,
- *         or 2 when printing unknown as '%' then the char
- */
-static int dispatch(char c, va_list ap)
-{
-	spec_t table[] = {
-		{'c', print_char},
-		{'s', print_string},
-		{'%', print_percent},
-		{'\0', NULL}
-	};
-	int i;
-
-	for (i = 0; table[i].sp; i++)
-		if (table[i].sp == c)
-			return (table[i].fn(ap));
-
-	if (_putchar('%') == -1)
-		return (-1);
-	if (_putchar(c) == -1)
-		return (-1);
-	return (2);
-}
-
-/**
- * _printf - minimal printf supporting %c, %s and %%
- * @format: format string
- * Return: total printed characters, or -1 on error
+ * _printf - produces output according to a format
+ * @format: format string with directives
+ * Return: number of characters printed, or -1 on error
  */
 int _printf(const char *format, ...)
 {
 	va_list ap;
-	int i = 0, count = 0, n;
+	int count = 0;
 
 	if (!format)
 		return (-1);
 
 	va_start(ap, format);
-
-	while (format[i])
+	while (*format)
 	{
-		if (format[i] != '%')
+		if (*format != '%')
 		{
-			if (_putchar(format[i]) == -1)
-			{
-				count = -1;
-				break;
-			}
+			_putchar(*format);
 			count++;
-			i++;
+			format++;
 			continue;
 		}
-		i++; /* skip '%' */
-		if (!format[i]) /* lone % at end -> error */
-		{
-			count = -1;
-			break;
-		}
-		n = dispatch(format[i], ap);
-		if (n == -1)
-		{
-			count = -1;
-			break;
-		}
-		count += n;
-		i++;
-	}
 
+		format++;
+		if (!*format)
+		{
+			va_end(ap);
+			return (-1);
+		}
+
+		count += get_spec(*format, ap);
+		format++;
+	}
 	va_end(ap);
 	return (count);
 }
