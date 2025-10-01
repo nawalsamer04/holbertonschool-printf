@@ -3,30 +3,19 @@
 
 #include <stdarg.h>
 #include <unistd.h>
-#include <stddef.h>
-/**
- * struct spec_s - specifier map
- * @sp: specifier character
- * @fn: handler function
- */
 
-typedef struct spec_s
-{
-	char sp;
-	int (*fn)(va_list);
-} spec_t;
-
-int _printf(const char *format, ...);
-
-/* Task 0 */
-int print_char(va_list ap);
-int print_string(va_list ap);
-int print_percent(va_list ap);
-
-/* Task 1 */
-int print_int(va_list ap);
-
+/* _putchar.c */
 int _putchar(char c);
 
-#endif
+/* _printf.c */
+int _printf(const char *format, ...);
+
+/* print helpers */
+int print_char_va(va_list ap);
+int print_string_va(va_list ap);
+int print_number(int n);
+int print_unsigned(unsigned int un);
+int print_binary(va_list ap);   /* <<< الإضافة الجديدة */
+
+#endif /* MAIN_H */
 
