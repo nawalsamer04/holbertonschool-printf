@@ -1,0 +1,49 @@
+.TH _printf 3 "October 2025" "Holberton School" "Custom Print Function Manual"
+.SH NAME
+_printf \- custom formatted output function, similar to printf
+
+.SH SYNOPSIS
+.B #include "main.h"
+.PP
+.B int _printf(const char *format, ...);
+
+.SH DESCRIPTION
+The _printf function is a custom implementation of the standard printf function.
+It produces output according to a format string and supports the following specifiers:
+
+.TP
+.B %c
+Print a single character.
+
+.TP
+.B %s
+Print a string.
+
+.TP
+.B %%
+Print a percent sign.
+
+.TP
+.B %d, %i
+Print a signed decimal integer.
+
+.SH RETURN VALUE
+Returns the number of characters printed (excluding the null byte).
+Returns -1 on error.
+
+.SH EXAMPLES
+.nf
+_printf("Hello %s\\n", "Nawal");
+_printf("Score: %d%%\\n", 100);
+.fi
+
+.SH FILES
+man_3_printf - the manual page file in this project
+holbertonschool-printf - project repository
+
+.SH AUTHORS
+Nawal Alharbi and Nabel Aldwese
+
+.SH NOTES
+This man page documents the functionality implemented in Tasks 0 and 1 of the _printf project.
+Additional format specifiers may be added in later tasks
