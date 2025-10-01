@@ -1,0 +1,48 @@
+#include "main.h"
+
+/**
+ * dispatch - routes to the correct handler
+ * @c: specifier character
+ * @ap: variadic argument list
+ * Return: chars printed by handler, -1 on error,
+ *         or 2 when printing unknown as '%' then the char
+ */
+static int dispatch(char c, va_list ap)
+{
+	spec_t table[] = {
+		{'c', print_char},
+		{'s', print_string},
+		{'%', print_percent},
+		{'\0', NULL}
+	};
+	int i;
+
+	for (i = 0; table[i].sp; i++)
+		if (table[i].sp == c)
+			return (table[i].fn(ap));
+
+	if (_putchar('%') == -1)
+		return (-1);
+	if (_putchar(c) == -1)
+		return (-1);
+	return (2);
+}
+
+/**
+ * _printf - minimal printf supporting %c, %s and %%
+ * @format: format string
+ * Return: total printed characters, or -1 on error
+ */
+int _printf(const char *format, ...)
+{
+	va_list ap;
+	int i = 0, count = 0, n;
+
+	if (!format)
+		return (-1);
+
+	va_start(ap, format);
+
+	while (format[i])
+	{
+		if (format[i] != '%
