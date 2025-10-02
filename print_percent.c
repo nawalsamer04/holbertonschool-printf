@@ -1,13 +1,16 @@
 #include "main.h"
 
 /**
- * print_percent - prints a literal percent sign for %%
- * @ap: variadic argument list (unused)
+ * print_percent - handle %%
+ * @ap: variadic list (unused)
+ * @b: buffer context
  * Return: 1 on success, -1 on error
  */
-int print_percent(va_list ap)
+int print_percent(va_list ap, buffer_t *b)
 {
 	(void)ap;
-	return (_putchar('%'));
+	if (buf_putc(b, '%') == -1)
+		return (-1);
+	return (1);
 }
 

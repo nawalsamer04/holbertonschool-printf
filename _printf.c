@@ -1,72 +1,91 @@
 #include "main.h"
-#include <stdarg.h>
 
 /**
- * _printf - produces output according to a format
- * Supported: %c, %s, %d, %i, %u, %%, %b
+ * dispatch - route specifier to handler
+ * @sp: specifier character
+ * @ap: variadic list
+ * @b: buffer context
+ * Return: chars handled by the spec,  -1 on error
+ */
+static int dispatch(char sp, va_list ap, buffer_t *b)
+{
+	int n = -1;
+
+	switch (sp)
+	{
+	case 'c':
+		n = print_char(ap, b);
+		break;
+	case 's':
+		n = print_string(ap, b);
+		break;
+	case '%':
+		n = print_percent(ap, b);
+		break;
+	default:
+		/* Unknown: print '%' then the character */
+		if (buf_putc(b, '%') == -1 || buf_putc(b, sp) == -1)
+			return (-1);
+		n = 2;
+		break;
+	}
+	return (n);
+}
+
+/**
+ * _printf - minimal printf supporting %c, %s and %%
+ *           using a local 1024-byte buffer
  * @format: format string
- * Return: number of characters printed, or -1 on error
+ * Return: total printed characters, or -1 on error
  */
 int _printf(const char *format, ...)
 {
 	va_list ap;
-	int i, count = 0;
+	buffer_t buf = {{0}, 0, 0};
+	int i = 0, r;
 
-	if (format == NULL)
+	if (!format)
 		return (-1);
 
 	va_start(ap, format);
 
-	for (i = 0; format[i] != '\0'; i++)
+	while (format[i])
 	{
 		if (format[i] != '%')
 		{
-			_putchar(format[i]);
-			count++;
+			if (buf_putc(&buf, format[i]) == -1)
+			{
+				va_end(ap);
+				return (-1);
+			}
+			i++;
 			continue;
 		}
 
-		/* handle '%' */
-		i++;
-		if (format[i] == '\0')
+		i++; /* skip '%' */
+		if (!format[i]) /* lone '%' at end -> error */
 		{
 			va_end(ap);
-			return (-1); /* stray '%' at end */
+			return (-1);
 		}
 
-		switch (format[i])
+		r = dispatch(format[i], ap, &buf);
+		if (r == -1)
 		{
-		case 'c':
-			count += print_char_va(ap);
-			break;
-		case 's':
-			count += print_string_va(ap);
-			break;
-		case 'd':
-		case 'i':
-			count += print_number(va_arg(ap, int));
-			break;
-		case 'u':
-			count += print_unsigned(va_arg(ap, unsigned int));
-			break;
-		case 'b':
-			/* هذه الدالة موجودة في print_binary.c */
-			count += print_binary(ap);
-			break;
-		case '%':
-			_putchar('%');
-			count++;
-			break;
-		default:
-			/* سلوك متوافق مع المشروع: اطبع '%' والحرف كما هو */
-			_putchar('%');
-			_putchar(format[i]);
-			count += 2;
-			break;
+			va_end(ap);
+			return (-1);
 		}
+		i++;
+	}
+
+	/* flush any remaining bytes */
+	if (buf_flush(&buf) == -1)
+	{
+		va_end(ap);
+		return (-1);
 	}
 
 	va_end(ap);
-	return (count);
+	return (buf.count);
 }
 
