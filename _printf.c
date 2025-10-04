@@ -1,20 +1,15 @@
 #include "main.h"
 
 /**
- * _printf - minimal printf supporting c, s, %, b
+ * process_format - walk the format string and print
  * @format: format string
+ * @ap: variadic arguments
  * Return: number of chars printed, or -1 on error
  */
-int _printf(const char *format, ...)
+static int process_format(const char *format, va_list ap)
 {
-	va_list ap;
 	int i = 0, count = 0;
 	int (*f)(va_list);
-
-	if (!format)
-		return (-1);
-
-	va_start(ap, format);
 
 	while (format[i])
 	{
@@ -48,8 +43,26 @@ int _printf(const char *format, ...)
 		}
 		i++;
 	}
+	return (count);
+}
 
+/**
+ * _printf - minimal printf supporting c, s, %, b
+ * @format: format string
+ * Return: number of chars printed, or -1 on error
+ */
+int _printf(const char *format, ...)
+{
+	va_list ap;
+	int count;
+
+	if (!format)
+		return (-1);
+
+	va_start(ap, format);
+	count = process_format(format, ap);
 	va_end(ap);
+
 	return (count);
 }
 
