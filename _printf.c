@@ -3,19 +3,20 @@
 /**
  * process_format - walk the format string and print
  * @format: format string
- * @ap: variadic arguments
- * Return: number of chars printed, or -1 on error
+ * @ap: arg list
+ * @b: buffer
+ * Return: count or -1 on error
  */
-static int process_format(const char *format, va_list ap)
+static int process_format(const char *format, va_list ap, buffer_t *b)
 {
 	int i = 0, count = 0;
-	int (*f)(va_list);
+	int (*fn)(va_list, buffer_t *);
 
 	while (format[i])
 	{
 		if (format[i] != '%')
 		{
-			if (_putchar(format[i]) == -1)
+			if (buf_putc(b, format[i]) == -1)
 				return (-1);
 			count++;
 		}
@@ -25,10 +26,10 @@ static int process_format(const char *format, va_list ap)
 			if (!format[i])
 				return (-1);
 
-			f = get_spec(format[i]);
-			if (f)
+			fn = get_spec(format[i]);
+			if (fn)
 			{
-				int n = f(ap);
+				int n = fn(ap, b);
 
 				if (n == -1)
 					return (-1);
@@ -36,7 +37,7 @@ static int process_format(const char *format, va_list ap)
 			}
 			else
 			{
-				if (_putchar('%') == -1 || _putchar(format[i]) == -1)
+				if (buf_putc(b, '%') == -1 || buf_putc(b, format[i]) == -1)
 					return (-1);
 				count += 2;
 			}
@@ -49,20 +50,23 @@ static int process_format(const char *format, va_list ap)
 /**
  * _printf - minimal printf supporting c, s, %, b
  * @format: format string
- * Return: number of chars printed, or -1 on error
+ * Return: number printed or -1
  */
 int _printf(const char *format, ...)
 {
 	va_list ap;
+	buffer_t buf = {{0}, 0};
 	int count;
 
 	if (!format)
 		return (-1);
 
 	va_start(ap, format);
-	count = process_format(format, ap);
+	count = process_format(format, ap, &buf);
 	va_end(ap);
 
+	if (count != -1 && buf_flush(&buf) == -1)
+		return (-1);
 	return (count);
 }
 

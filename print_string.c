@@ -2,15 +2,14 @@
 
 /**
  * print_string - handle %s
- * @ap: variadic list
- * @b: buffer context
- * Return: number of chars handled, or -1 on error
- * Note: prints "(null)" if the string pointer is NULL.
+ * @ap: arg list
+ * @b: buffer
+ * Return: chars printed or -1
  */
 int print_string(va_list ap, buffer_t *b)
 {
 	char *s = va_arg(ap, char *);
-	int n = 0;
+	int count = 0;
 
 	if (!s)
 		s = "(null)";
@@ -19,8 +18,8 @@ int print_string(va_list ap, buffer_t *b)
 	{
 		if (buf_putc(b, *s++) == -1)
 			return (-1);
-		n++;
+		count++;
 	}
-	return (n);
+	return (count);
 }
 

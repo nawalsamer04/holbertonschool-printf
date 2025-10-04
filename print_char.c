@@ -2,9 +2,9 @@
 
 /**
  * print_char - handle %c
- * @ap: variadic list
- * @b: buffer context
- * Return: number of chars handled (1) or -1 on error
+ * @ap: arg list
+ * @b: buffer
+ * Return: chars printed or -1
  */
 int print_char(va_list ap, buffer_t *b)
 {
