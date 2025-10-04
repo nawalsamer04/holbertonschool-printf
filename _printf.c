@@ -1,48 +1,15 @@
 #include "main.h"
 
 /**
- * dispatch - route specifier to handler
- * @sp: specifier character
- * @ap: variadic list
- * @b: buffer context
- * Return: chars handled by the spec,  -1 on error
- */
-static int dispatch(char sp, va_list ap, buffer_t *b)
-{
-	int n = -1;
-
-	switch (sp)
-	{
-	case 'c':
-		n = print_char(ap, b);
-		break;
-	case 's':
-		n = print_string(ap, b);
-		break;
-	case '%':
-		n = print_percent(ap, b);
-		break;
-	default:
-		/* Unknown: print '%' then the character */
-		if (buf_putc(b, '%') == -1 || buf_putc(b, sp) == -1)
-			return (-1);
-		n = 2;
-		break;
-	}
-	return (n);
-}
-
-/**
- * _printf - minimal printf supporting %c, %s and %%
- *           using a local 1024-byte buffer
+ * _printf - minimal printf supporting c, s, %, b
  * @format: format string
- * Return: total printed characters, or -1 on error
+ * Return: number of chars printed, or -1 on error
  */
 int _printf(const char *format, ...)
 {
 	va_list ap;
-	buffer_t buf = {{0}, 0, 0};
-	int i = 0, r;
+	int i = 0, count = 0;
+	int (*f)(va_list);
 
 	if (!format)
 		return (-1);
@@ -53,39 +20,36 @@ int _printf(const char *format, ...)
 	{
 		if (format[i] != '%')
 		{
-			if (buf_putc(&buf, format[i]) == -1)
-			{
-				va_end(ap);
+			if (_putchar(format[i]) == -1)
 				return (-1);
-			}
+			count++;
+		}
+		else
+		{
 			i++;
-			continue;
-		}
+			if (!format[i])
+				return (-1);
 
-		i++; /* skip '%' */
-		if (!format[i]) /* lone '%' at end -> error */
-		{
-			va_end(ap);
-			return (-1);
-		}
+			f = get_spec(format[i]);
+			if (f)
+			{
+				int n = f(ap);
 
-		r = dispatch(format[i], ap, &buf);
-		if (r == -1)
-		{
-			va_end(ap);
-			return (-1);
+				if (n == -1)
+					return (-1);
+				count += n;
+			}
+			else
+			{
+				if (_putchar('%') == -1 || _putchar(format[i]) == -1)
+					return (-1);
+				count += 2;
+			}
 		}
 		i++;
 	}
 
-	/* flush any remaining bytes */
-	if (buf_flush(&buf) == -1)
-	{
-		va_end(ap);
-		return (-1);
-	}
-
 	va_end(ap);
-	return (buf.count);
+	return (count);
 }
 

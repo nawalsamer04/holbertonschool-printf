@@ -5,29 +5,28 @@
 #include <unistd.h>
 
 /**
- * struct buffer_s - local buffered output (no globals)
- * @buf: data area
- * @i:   current index in buf
- * @count: total characters accounted for output
+ * struct spec_s - map of specifier to handler
+ * @sp: specifier character
+ * @fn: handler function
  */
-typedef struct buffer_s
+typedef struct spec_s
 {
-	char buf[1024];
-	int i;
-	int count;
-} buffer_t;
+	char sp;
+	int (*fn)(va_list);
+} spec_t;
 
-/* Core */
+/* core */
 int _printf(const char *format, ...);
+int _putchar(char c);
 
-/* Buffered I/O helpers */
-int buf_putc(buffer_t *b, char c);
-int buf_flush(buffer_t *b);
+/* dispatch */
+int (*get_spec(char c))(va_list);
 
-/* Handlers (updated signatures to use buffer) */
-int print_char(va_list ap, buffer_t *b);
-int print_string(va_list ap, buffer_t *b);
-int print_percent(va_list ap, buffer_t *b);
+/* handlers */
+int print_char(va_list ap);
+int print_string(va_list ap);
+int print_percent(va_list ap);
+int print_binary(va_list ap);
 
 #endif /* MAIN_H */
 
